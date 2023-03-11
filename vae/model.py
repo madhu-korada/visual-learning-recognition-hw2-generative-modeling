@@ -21,20 +21,36 @@ class Encoder(nn.Module):
                 (6): Conv2d(128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
             )
         """
+        self.layers = nn.Sequential(
+            nn.Conv2d(3, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
+            nn.ReLU(),
+            nn.Conv2d(32, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1)),
+            nn.ReLU(),
+            nn.Conv2d(64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1)),
+            nn.ReLU(),
+            nn.Conv2d(128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        )
 
         #TODO 2.1: fill in self.fc, such that output dimension is self.latent_dim
-
+        self.fc = nn.Linear(256, self.latent_dim)
+    
     def forward(self, x):
         #TODO 2.1 : forward pass through the network, output should be of dimension : self.latent_dim
-
+        x = self.layers(x)
+        x = x.view(x.shape[0], -1) # flatten
+        out = self.fc(x)
+        return out
+    
 class VAEEncoder(Encoder):
     def __init__(self, input_shape, latent_dim):
         super().__init__(input_shape, latent_dim)
         #TODO 2.4: fill in self.fc, such that output dimension is 2*self.latent_dim
+        self.fc = nn.Linear(256, 2*self.latent_dim)
 
     def forward(self, x):
         #TODO 2.4: forward pass through the network.
         # should return a tuple of 2 tensors, mu and log_std
+        
         return mu, log_std
 
 
@@ -45,7 +61,7 @@ class Decoder(nn.Module):
         self.output_shape = output_shape
 
         #TODO 2.1: fill in self.base_size
-
+        self.base_size = 2 #TODO Madhu: because 32 / 2**3 = 2 (????)
         """
         TODO 2.1 : Fill in self.deconvs following the given architecture
         Sequential(
@@ -59,9 +75,22 @@ class Decoder(nn.Module):
                 (7): Conv2d(32, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
             )
         """
+        self.layers = nn.Sequential(
+            nn.ReLU(),
+            nn.ConvTranspose2d(256, 128, kernel_size=(4, 4), stride=(2, 2), padding=(1, 1)),
+            nn.ReLU(),
+            nn.ConvTranspose2d(128, 64, kernel_size=(4, 4), stride=(2, 2), padding=(1, 1)),
+            nn.ReLU(),
+            nn.ConvTranspose2d(64, 32, kernel_size=(4, 4), stride=(2, 2), padding=(1, 1)),
+            nn.ReLU(),
+            nn.Conv2d(32, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        )
 
     def forward(self, z):
         #TODO 2.1: forward pass through the network, first through self.fc, then self.deconvs.
+        z = z.view(z.shape[0], 256, self.base_size, self.base_size)
+        z = self.layers(z)
+        out = torch.sigmoid(z) #TODO Madhu: why sigmoid?
         return out
 
 class AEModel(nn.Module):
