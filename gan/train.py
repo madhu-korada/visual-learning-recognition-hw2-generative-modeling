@@ -14,6 +14,10 @@ def build_transforms():
     # 1. Convert input image to tensor.
     # 2. Rescale input image to be between -1 and 1.
     # NOTE: don't do anything fancy for 2, hint: the input image is between 0 and 1.
+    ds_transforms = transforms.Compose(
+        transforms.ConvertImageDtype(torch.float32),
+        transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+    )
     return ds_transforms
 
 
@@ -24,6 +28,11 @@ def get_optimizers_and_schedulers(gen, disc):
     # 2. Construct the learning rate schedulers for the generator and discriminator.
     # The learning rate for the discriminator should be decayed to 0 over 500K iterations.
     # The learning rate for the generator should be decayed to 0 over 100K iterations.
+    optim_discriminator = torch.optim.Adam(disc.parameters(), lr=0.0002, betas=(0, 0.9))
+    optim_generator = torch.optim.Adam(gen.parameters(), lr=0.0002, betas=(0, 0.9))
+    scheduler_discriminator = torch.optim.lr_scheduler.LambdaLR(optim_discriminator, lambda x: 1 - x / 500000)
+    scheduler_generator = torch.optim.lr_scheduler.LambdaLR(optim_generator, lambda x: 1 - x / 100000)
+    
     return (
         optim_discriminator,
         scheduler_discriminator,
@@ -92,9 +101,10 @@ def train_model(
                 # 1. Compute generator output -> the number of samples must match the batch size.
                 # 2. Compute discriminator output on the train batch.
                 # 3. Compute the discriminator output on the generated data.
-
+                output_generator = gen()# ?????????
+                output_descriminator_org = disc(train_batch)
+                output_descriminator_generated = disc(output_generator)
                 # TODO: 1.5 Compute the interpolated batch and run the discriminator on it.
-
 
             optim_discriminator.zero_grad(set_to_none=True)
             scaler.scale(discriminator_loss).backward()

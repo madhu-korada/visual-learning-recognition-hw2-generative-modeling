@@ -1,0 +1,12 @@
+{
+    "python.linting.enabled": true,
+    "python.languageServer": "Pylance",
+    "editor.semanticHighlighting.enabled": true,
+    "python.terminal.activateEnvironment": false,
+    "python.linting.pylintArgs": [
+        "--errors-only",
+        "--generated-members=numpy.* ,torch.* ,cv2.* , cv.*"
+        ],
+    "python.pythonPath": "/home/madhu/tools/miniconda3/envs/vlr/bin/python3.9",
+    "PYTHONPATH": "/home/madhu/tools/miniconda3/envs/vlr/bin/python3.9"
+}
