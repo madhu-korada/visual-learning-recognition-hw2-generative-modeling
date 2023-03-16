@@ -26,11 +26,9 @@ class UpSampleConv2D(torch.jit.ScriptModule):
         # 2. Use pixel shuffle (https://pytorch.org/docs/master/generated/torch.nn.PixelShuffle.html#torch.nn.PixelShuffle)
         # to form a (batch x channel x height*upscale_factor x width*upscale_factor) output
         # 3. Apply convolution and return output
-        print(x.shape)
-        x_repeated = x.repeat(1, self.upscale_factor**2, 1, 1)
-        print(x_repeated.shape)
+        # x_repeated = x.repeat(1, self.upscale_factor**2, 1, 1)
+        x_repeated = x.repeat_interleave(self.upscale_factor**2, dim=1)
         output_pixelsuffle = F.pixel_shuffle(x_repeated, self.upscale_factor)
-        print(output_pixelsuffle.shape)
         return self.conv(output_pixelsuffle)
         
 
@@ -54,8 +52,9 @@ class DownSampleConv2D(torch.jit.ScriptModule):
         # 2. Then split channel wise into (downscale_factor^2xbatch x channel x height x width) images
         # 3. Average across dimension 0, apply convolution and return output
         output_pixelunshuffle = F.pixel_unshuffle(x, self.downscale_ratio)
-        output_split = output_pixelunshuffle.view(-1, x.shape[1], x.shape[2], x.shape[3])
-        output = torch.mean(output_split, dim=0)
+        # output_split = output_pixelunshuffle.view(-1, x.shape[1], x.shape[2], x.shape[3])
+        output_split = output_pixelunshuffle.reshape(x.shape[0], -1, self.downscale_ratio**2, x.shape[2], x.shape[3])
+        output = torch.mean(output_split, dim=2)
         return self.conv(output)
 
 class ResBlockUp(torch.jit.ScriptModule):
@@ -257,8 +256,10 @@ class Generator(torch.jit.ScriptModule):
     @torch.jit.script_method
     def forward(self, n_samples: int = 1024):
         # TODO 1.1: Generate n_samples latents and forward through the network.
-        rand_samples = torch.randn(n_samples, 128)
+        # rand_samples = torch.randn(n_samples, 128)
+        rand_samples = torch.normal(0., 1., size=(n_samples, 128)).to(torch.float16).to(torch.device("cuda"))
         out = self.forward_given_samples(rand_samples)
+        
         return out
         
 
@@ -333,6 +334,7 @@ class Discriminator(torch.jit.ScriptModule):
         # Make sure to sum across the image dimensions after passing x through self.layers.
         x = self.layers(x)
         x = x.sum(dim=(2,3))
+        x = x.view(-1, 128)
         out = self.linear(x)
         return out
 
