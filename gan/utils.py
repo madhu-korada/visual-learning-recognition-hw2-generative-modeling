@@ -42,7 +42,7 @@ def interpolate_latent_space(gen, path):
     
     
     # With mean 0 and standard deviation 1.
-    sample = torch.normal(mean=0, std=1, size=(1, 128)).to(gen.device) # 1. use repeat, why??
+    sample = torch.normal(mean=0, std=1, size=(1, 128)).cuda()         # 1. use repeat, why??
     samples = sample.repeat(100, 1)                                    # 1. shape: (100, 128)
     # samples = torch.zeros(100, 128)
     

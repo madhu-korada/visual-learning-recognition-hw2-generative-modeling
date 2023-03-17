@@ -14,11 +14,11 @@ def build_transforms():
     # 1. Convert input image to tensor.
     # 2. Rescale input image to be between -1 and 1.
     # NOTE: don't do anything fancy for 2, hint: the input image is between 0 and 1.
-    ds_transforms = transforms.Compose(
-        # transforms.ConvertImageDtype(torch.float32),
+    ds_transforms = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
-    )
+        # transforms.ConvertImageDtype(torch.float32),
+    ])
     return ds_transforms
 
 
@@ -108,7 +108,7 @@ def train_model(
                 discrim_fake = disc(generated_samples)
                 
                 # TODO: 1.5 Compute the interpolated batch and run the discriminator on it.
-                eps = torch.rand((1))
+                eps = torch.rand((1)).to(device=train_batch.device)
                 interp = eps * train_batch + (1 - eps) * generated_samples
                 descrim_interp = disc(interp)
                 discriminator_loss = disc_loss_fn(discrim_real, discrim_fake, descrim_interp, interp, lamb)

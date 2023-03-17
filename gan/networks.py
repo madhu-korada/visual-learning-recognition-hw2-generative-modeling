@@ -27,7 +27,7 @@ class UpSampleConv2D(torch.jit.ScriptModule):
         # to form a (batch x channel x height*upscale_factor x width*upscale_factor) output
         # 3. Apply convolution and return output
         # x_repeated = x.repeat(1, self.upscale_factor**2, 1, 1)
-        x_repeated = x.repeat_interleave(self.upscale_factor**2, dim=1)
+        x_repeated = x.repeat_interleave(int(self.upscale_factor**2), dim=1)
         output_pixelsuffle = F.pixel_shuffle(x_repeated, self.upscale_factor)
         return self.conv(output_pixelsuffle)
         
@@ -51,9 +51,9 @@ class DownSampleConv2D(torch.jit.ScriptModule):
         # to form a (batch x channel * downscale_factor^2 x height x width) output
         # 2. Then split channel wise into (downscale_factor^2xbatch x channel x height x width) images
         # 3. Average across dimension 0, apply convolution and return output
-        output_pixelunshuffle = F.pixel_unshuffle(x, self.downscale_ratio)
-        # output_split = output_pixelunshuffle.view(-1, x.shape[1], x.shape[2], x.shape[3])
-        output_split = output_pixelunshuffle.reshape(x.shape[0], -1, self.downscale_ratio**2, x.shape[2], x.shape[3])
+        output_pu = F.pixel_unshuffle(x, self.downscale_ratio)
+        output_split = output_pu.reshape(output_pu.shape[0], -1, int(self.downscale_ratio**2), \
+                                                     output_pu.shape[2], output_pu.shape[3])
         output = torch.mean(output_split, dim=2)
         return self.conv(output)
 
@@ -338,24 +338,24 @@ class Discriminator(torch.jit.ScriptModule):
         out = self.linear(x)                                # out: (batch_size, 1)                          
         return out
 
-if __name__ == "__main__":
-    print("Network Testings: ")
-    rand_input = torch.randn(100, 128)
-    rand_output = torch.randn(1024, 128)
+# if __name__ == "__main__":
+#     print("Network Testings: ")
+#     rand_input = torch.randn(100, 128)
+#     rand_output = torch.randn(1024, 128)
     
-    model_gen = Generator()
-    print(model_gen)
-    model_dis = Discriminator()
-    print(model_dis)
-    # print(model.forward().shape)
+#     model_gen = Generator()
+#     print(model_gen)
+#     model_dis = Discriminator()
+#     print(model_dis)
+#     # print(model.forward().shape)
     
-    # mdoel_res = ResBlockUp(input_channels=128, n_filters=128)
-    # print(mdoel_res)
-    # model_res_down = ResBlockDown(input_channels=3, n_filters=128)
-    # print(model_res_down)
-    rand_upsample = torch.randn(1, 128, 4, 4)
-    # print(UpSampleConv2D(128, 3, 128)(rand_upsample).shape)
+#     # mdoel_res = ResBlockUp(input_channels=128, n_filters=128)
+#     # print(mdoel_res)
+#     # model_res_down = ResBlockDown(input_channels=3, n_filters=128)
+#     # print(model_res_down)
+#     rand_upsample = torch.randn(1, 128, 4, 4)
+#     # print(UpSampleConv2D(128, 3, 128)(rand_upsample).shape)
     
-    upsample = torch.jit.script(model_gen, example_inputs=rand_input)
-    # print(upsample(rand_upsample))
+#     upsample = torch.jit.script(model_gen, example_inputs=rand_input)
+#     # print(upsample(rand_upsample))
     

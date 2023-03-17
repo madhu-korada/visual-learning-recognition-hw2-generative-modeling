@@ -1,0 +1,16 @@
+compute FID of a model with cub-32 statistics
+Iteration 1000 FID: 190.256654606825
+compute FID of a model with cub-32 statistics
+Iteration 2000 FID: 201.06149812864072
+compute FID of a model with cub-32 statistics
+Iteration 3000 FID: 153.66969546080264
+compute FID of a model with cub-32 statistics
+Iteration 4000 FID: 107.07917504943521
+compute FID of a model with cub-32 statistics
+Iteration 5000 FID: 130.21101655411104
+compute FID of a model with cub-32 statistics
+Iteration 6000 FID: 113.87456107810402
+compute FID of a model with cub-32 statistics
+Iteration 7000 FID: 98.17930737940617
+compute FID of a model with cub-32 statistics
+Iteration 8000 FID: 97.97453166347196
