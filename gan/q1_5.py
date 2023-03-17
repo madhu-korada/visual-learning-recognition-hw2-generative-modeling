@@ -15,13 +15,15 @@ def compute_discriminator_loss(
     loss = E[D(fake_data)] - E[D(real_data)] + lambda * E[(|| grad wrt interpolated_data (D(interpolated_data))|| - 1)^2]
     """
     labes_real = torch.ones_like(discrim_real)
-    grad = torch.autograd.grad(discrim_interp, interp, \
+    grad = torch.autograd.grad(outputs=discrim_interp, inputs=interp, \
                                grad_outputs=labes_real, create_graph=True, \
                                retain_graph=True)[0]
     grad = grad.view(grad.size(0), -1)
+    grad_penality = torch.mean((torch.norm(grad, dim=1) - 1) ** 2)
     ## ????????????
-    loss = torch.mean(discrim_fake) - torch.mean(discrim_real) + \
-           lamb * torch.mean((torch.norm(grad, dim=1) - 1) ** 2)
+    loss = torch.mean(discrim_fake) - \
+           torch.mean(discrim_real) + \
+           lamb * grad_penality
     return loss
 
 
