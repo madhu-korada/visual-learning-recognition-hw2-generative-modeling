@@ -247,9 +247,9 @@ class Generator(torch.jit.ScriptModule):
     def forward_given_samples(self, z):
         # TODO 1.1: forward the generator assuming a set of samples z have been passed in.
         # Don't forget to re-shape the output of the dense layer into an image with the appropriate size!
-        x = self.linear(z)
-        x = x.view(-1, 128, 4, 4)
-        out = self.layers(x)
+        x = self.linear(z)                                  # x:   (batch_size, 128)  to (batch_size, 2048)
+        x = x.view(-1, 128, 4, 4)                           # x:   (batch_size, 2048) to (batch_size, 128, 4, 4)
+        out = self.layers(x)                                # out: (batch_size, 3, 32, 32)
         return out
     
     # @torch.jit.unused
@@ -257,7 +257,7 @@ class Generator(torch.jit.ScriptModule):
     def forward(self, n_samples: int = 1024):
         # TODO 1.1: Generate n_samples latents and forward through the network.
         # rand_samples = torch.randn(n_samples, 128)
-        rand_samples = torch.normal(0., 1., size=(n_samples, 128)).to(torch.float16).to(torch.device("cuda"))
+        rand_samples = torch.normal(mean=0., std=1., size=(n_samples, 128)).to(torch.float16).to(torch.device("cuda"))
         out = self.forward_given_samples(rand_samples)
         
         return out
@@ -332,10 +332,10 @@ class Discriminator(torch.jit.ScriptModule):
     def forward(self, x):
         # TODO 1.1: Forward the discriminator assuming a batch of images have been passed in.
         # Make sure to sum across the image dimensions after passing x through self.layers.
-        x = self.layers(x)
-        x = x.sum(dim=(2,3))
-        x = x.view(-1, 128)
-        out = self.linear(x)
+        x = self.layers(x)                                  # x:   (batch_size, 3, 32, 32) to (batch_size, 128, 4, 4)
+        x = x.sum(dim=(2,3))                                # x:   (batch_size, 128, 4, 4) to (batch_size, 128)
+        x = x.view(-1, 128)                                 # x:   (batch_size, 128)
+        out = self.linear(x)                                # out: (batch_size, 1)                          
         return out
 
 if __name__ == "__main__":
