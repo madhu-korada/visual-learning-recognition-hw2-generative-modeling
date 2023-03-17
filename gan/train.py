@@ -179,7 +179,7 @@ def train_model(
         dataset_name="cub",
         dataset_resolution=32,
         z_dimension=128,
-        batch_size=256,
+        batch_size=batch_size,#256,
         num_gen=50_000,
     )
     print(f"Final FID (Full 50K): {fid}")
