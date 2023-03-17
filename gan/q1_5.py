@@ -20,8 +20,8 @@ def compute_discriminator_loss(
                                retain_graph=True)[0]
     grad = grad.view(grad.size(0), -1)
     ## ????????????
-    loss = - torch.mean(discrim_fake) + torch.mean(discrim_real) + \
-              lamb * torch.mean((torch.norm(grad, dim=1) - 1) ** 2)
+    loss = torch.mean(discrim_fake) - torch.mean(discrim_real) + \
+           lamb * torch.mean((torch.norm(grad, dim=1) - 1) ** 2)
     return loss
 
 
