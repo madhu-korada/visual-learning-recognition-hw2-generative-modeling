@@ -4,6 +4,10 @@ gan/data_ls_gan/
 gan/data_wgan_gp/
 datasets/
 
+gan/data_gan.old/
+gan/data_ls_gan.old/
+gan/data_wgan_gp.old/
+
 gan_solutions/data_gan/
 gan_solutions/data_ls_gan/
 gan_solutions/data_wgan_gp/

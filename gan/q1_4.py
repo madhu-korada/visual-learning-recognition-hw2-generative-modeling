@@ -42,7 +42,7 @@ if __name__ == "__main__":
         gen,
         disc,
         num_iterations=int(3e4),
-        batch_size=32,#256,
+        batch_size=100,#256,
         prefix=prefix,
         gen_loss_fn=compute_generator_loss,
         disc_loss_fn=compute_discriminator_loss,
