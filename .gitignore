@@ -1,7 +1,7 @@
 vae_solutions/data/
-gan/data_gan/
-gan/data_ls_gan/
-gan/data_wgan_gp/
+# gan/data_gan/
+# gan/data_ls_gan/
+# gan/data_wgan_gp/
 datasets/
 
 gan/data_gan.old/
