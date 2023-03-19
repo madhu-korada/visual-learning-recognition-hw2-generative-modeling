@@ -1,0 +1,28 @@
+epoch 0
+epoch 1
+epoch 2
+epoch 3
+epoch 4
+4 {'recon_loss': 0.24830976, 'kl_loss': 0.04205198}
+4 {'recon_loss': 0.24822316, 'kl_loss': 0.014660644}
+epoch 5
+epoch 6
+epoch 7
+epoch 8
+epoch 9
+9 {'recon_loss': 0.24802302, 'kl_loss': 0.025330836}
+9 {'recon_loss': 0.24806888, 'kl_loss': 0.01838379}
+epoch 10
+epoch 11
+epoch 12
+epoch 13
+epoch 14
+14 {'recon_loss': 0.24808247, 'kl_loss': 0.019710619}
+14 {'recon_loss': 0.24788423, 'kl_loss': 0.010583496}
+epoch 15
+epoch 16
+epoch 17
+epoch 18
+epoch 19
+19 {'recon_loss': 0.24807276, 'kl_loss': 0.017897002}
+19 {'recon_loss': 0.24787465, 'kl_loss': 0.008044434}
