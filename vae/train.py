@@ -21,7 +21,8 @@ def ae_loss(model, x):
     """
     encoder_out = model.encoder(x)
     decoder_out = model.decoder(encoder_out)
-    loss = F.mse_loss(decoder_out, x, reduction='mean')
+    # loss = F.mse_loss(decoder_out, x, reduction='mean')
+    loss = nn.MSELoss(reduction='sum')(decoder_out, x) / x.shape[0]
     
     return loss, OrderedDict(recon_loss=loss)
 
@@ -38,15 +39,18 @@ def vae_loss(model, x, beta = 1):
     varience = std ** 2
     log_varience = torch.log(varience)
     
-    decoder_in = mu + std * torch.randn_like(std)
+    decoder_in = mu + std * torch.randn_like(std) #torch.randn(size=std.shape).cuda()
     decoder_out = model.decoder(decoder_in)
     
-    recon_loss = F.mse_loss(decoder_out, x, reduction='mean')
+    ## recon_loss = F.mse_loss(decoder_out, x, reduction='mean')
+    recon_loss = nn.MSELoss(reduction='sum')(decoder_out, x) / x.shape[0]
     kl_loss = 0.5 * torch.mean(torch.sum(mu**2) + \
                                torch.sum(varience) - \
                                torch.sum(log_varience + 1))
     
+    
     total_loss = recon_loss + (beta * kl_loss)
+    
     return total_loss, OrderedDict(recon_loss=recon_loss, kl_loss=kl_loss)
 
 

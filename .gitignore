@@ -29,3 +29,5 @@ vae/data/cifar-10-batches-py/data_batch_4
 vae/data/cifar-10-batches-py/data_batch_5
 vae/data/cifar-10-batches-py/readme.html
 vae/data/cifar-10-batches-py/test_batch
+
+vae/data/cifar-10-python.tar.gz

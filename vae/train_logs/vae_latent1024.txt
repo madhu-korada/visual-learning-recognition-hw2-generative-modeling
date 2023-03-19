@@ -3,26 +3,26 @@ epoch 1
 epoch 2
 epoch 3
 epoch 4
-4 {'recon_loss': 0.2480644, 'kl_loss': 0.026566487}
-4 {'recon_loss': 0.24794373, 'kl_loss': 0.029919434}
+4 {'recon_loss': 205.41203, 'kl_loss': 61.36603}
+4 {'recon_loss': 199.00803, 'kl_loss': 58.443596}
 epoch 5
 epoch 6
 epoch 7
 epoch 8
 epoch 9
-9 {'recon_loss': 0.24808368, 'kl_loss': 0.0074736928}
-9 {'recon_loss': 0.24797185, 'kl_loss': 0.001171875}
+9 {'recon_loss': 159.19272, 'kl_loss': 56.44302}
+9 {'recon_loss': 157.37491, 'kl_loss': 56.93103}
 epoch 10
 epoch 11
 epoch 12
 epoch 13
 epoch 14
-14 {'recon_loss': 0.24802162, 'kl_loss': 0.009805485}
-14 {'recon_loss': 0.24795537, 'kl_loss': 0.00859375}
+14 {'recon_loss': 142.49278, 'kl_loss': 58.48576}
+14 {'recon_loss': 141.24269, 'kl_loss': 59.351463}
 epoch 15
 epoch 16
 epoch 17
 epoch 18
 epoch 19
-19 {'recon_loss': 0.24800931, 'kl_loss': 0.08643574}
-19 {'recon_loss': 0.24795108, 'kl_loss': 0.009777832}
+19 {'recon_loss': 137.57394, 'kl_loss': 59.871143}
+19 {'recon_loss': 135.94156, 'kl_loss': 60.360645}

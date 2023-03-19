@@ -3,26 +3,26 @@ epoch 1
 epoch 2
 epoch 3
 epoch 4
-4 {'recon_loss': 0.027917165}
-4 {'recon_loss': 0.025725257}
+4 {'recon_loss': 94.92273}
+4 {'recon_loss': 88.40096}
 epoch 5
 epoch 6
 epoch 7
 epoch 8
 epoch 9
-9 {'recon_loss': 0.019116074}
-9 {'recon_loss': 0.018991474}
+9 {'recon_loss': 61.79287}
+9 {'recon_loss': 62.533653}
 epoch 10
 epoch 11
 epoch 12
 epoch 13
 epoch 14
-14 {'recon_loss': 0.018109005}
-14 {'recon_loss': 0.01825812}
+14 {'recon_loss': 56.320423}
+14 {'recon_loss': 57.489674}
 epoch 15
 epoch 16
 epoch 17
 epoch 18
 epoch 19
-19 {'recon_loss': 0.017477846}
-19 {'recon_loss': 0.017956967}
+19 {'recon_loss': 54.390575}
+19 {'recon_loss': 56.111004}

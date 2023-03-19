@@ -30,24 +30,24 @@ class DiffusionModel(nn.Module):
 
         alphas = 1. - self.betas
         # TODO 3.1: compute the cumulative products for current and previous timesteps
-        self.alphas_cumprod = ...
-        self.alphas_cumprod_prev =  ...
+        self.alphas_cumprod = torch.cumprod(alphas, dim=0)
+        self.alphas_cumprod_prev = F.pad(self.alphas_cumprod[:-1], (1, 0), value = 1.)
 
         # TODO 3.1: pre-compute values needed for forward process
         # This is the coefficient of x_t when predicting x_0
-        self.x_0_pred_coef_1 = ...
+        self.x_0_pred_coef_1 = 1 / torch.sqrt(self.alphas_cumprod)
         # This is the coefficient of pred_noise when predicting x_0
-        self.x_0_pred_coef_2 = ...
+        self.x_0_pred_coef_2 = torch.sqrt(1 - self.alphas_cumprod) / torch.sqrt(self.alphas_cumprod)
 
         # TODO 3.1: compute the coefficients for the mean
         # This is coefficient of x_0 in the DDPM section
-        self.posterior_mean_coef1 = ...
+        self.posterior_mean_coef1 = torch.sqrt(self.alphas_cumprod_prev)*(self.betas/(1 - self.alphas_cumprod))
         # This is coefficient of x_t in the DDPM section
-        self.posterior_mean_coef2 = ...
+        self.posterior_mean_coef2 = torch.sqrt(alphas)*(1 - self.alphas_cumprod_prev)/(1 - self.alphas_cumprod)
 
         # TODO 3.1: compute posterior variance
         # calculations for posterior q(x_{t-1} | x_t, x_0) in DDPM
-        self.posterior_variance = ...
+        self.posterior_variance = self.betas * (1 - self.alphas_cumprod_prev)/(1 - self.alphas_cumprod)
         self.posterior_log_variance_clipped = torch.log(
             self.posterior_variance.clamp(min =1e-20))
 
@@ -62,6 +62,11 @@ class DiffusionModel(nn.Module):
         # TODO 3.1: Compute the posterior mean and variance for x_{t-1}
         # using the coefficients, x_t, and x_0
         # hint: can use extract function from utils.py
+        posterior_mean = extract(self.posterior_mean_coef1, t, x_shape=x_t.shape) * x_0 + \
+                         extract(self.posterior_mean_coef2, t, x_shape=x_t.shape) * x_t
+        posterior_variance = extract(self.posterior_variance, t, x_shape=x_t.shape)
+        posterior_log_variance_clipped = extract(self.posterior_log_variance_clipped, t, x_shape=x_t.shape)
+        
         return posterior_mean, posterior_variance, posterior_log_variance_clipped
 
     def model_predictions(self, x_t, t):
@@ -69,6 +74,13 @@ class DiffusionModel(nn.Module):
         # to predict the additive noise, use the denoising model.
         # Hint: You can use extract function from utils.py.
         # clamp x_0 to [-1, 1]
+        pred_noise = self.model(x_t)
+        coef_1 = torch.sqrt(1/self.alphas_cumprod)
+        coef_2 = torch.sqrt(1/self.alphas_cumprod-1)
+        x_0 = extract(coef_1, t, x_shape=x_t.shape) * x_t + \
+              extract(coef_2, t, x_shape=x_t.shape) * pred_noise
+
+        x_0 = torch.clamp(x_0, min=-1, max=1, out=x_0)
         return (pred_noise, x_0)
 
     @torch.no_grad()
@@ -76,6 +88,11 @@ class DiffusionModel(nn.Module):
         # TODO 3.1: given x at timestep t, predict the denoised image at x_{t-1}.
         # also return the predicted starting image.
         # Hint: To do this, you will need a predicted x_0. Which function can do this for you?
+        (pred_noise, x_0) = self.model_predictions(x, t)
+        noise = torch.randn_like(x_0)
+        noise[t<0] = 0
+        model_mean, posterior_variance, _ = self.get_posterior_parameters(x_0, x, t)
+        pred_img = model_mean + torch.sqrt(posterior_variance) * noise
         return pred_img, x_0
 
     @torch.no_grad()
@@ -89,25 +106,39 @@ class DiffusionModel(nn.Module):
 
     def sample_times(self, total_timesteps, sampling_timesteps):
         # TODO 3.2: Generate a list of times to sample from.
-        pass
+        times_to_sample = torch.arange(0, total_timesteps, total_timesteps/sampling_timesteps, device=self.device)
+        times_to_sample = times_to_sample.int().tolist()
+        return reversed(times_to_sample)
 
     def get_time_pairs(self, times):
         # TODO 3.2: Generate a list of adjacent time pairs to sample from.
-        pass
+        return list(zip(times[:-1], times[1:]))
 
     def ddim_step(self, batch, device, tau_i, tau_isub1, img, model_predictions, alphas_cumprod, eta):
         # TODO 3.2: Compute the output image for a single step of the DDIM sampling process.
 
+        tau_i, tau_isub1 = torch.tensor(tau_i).cuda(), torch.tensor(tau_isub1).cuda()
         # predict x_0 and the additive noise for tau_i
+        pred_noise, x_0 = model_predictions(img, tau_i)
 
         # extract \alpha_{\tau_{i - 1}} and \alpha_{\tau_{i}}
-
+        alpha_isub1, alpha_i = extract(alphas_cumprod, tau_isub1, x_shape=img.shape), \
+                               extract(alphas_cumprod, tau_i, x_shape=img.shape)
+        alpha_bar_t = self.alphas_cumprod[tau_i]
+        alpha_bar_t_1 = self.alphas_cumprod[tau_isub1]
+        
         # compute \sigma_{\tau_{i}}
-
+        sigma_i_2 = eta * (1-alpha_bar_t_1)/(1-alpha_bar_t)*(1-alpha_isub1)
+        sigma_i = torch.sqrt(sigma_i_2)
+        
         # compute the coefficient of \epsilon_{\tau_{i}}
+        pred_noise_coeff = torch.sqrt(1. - alpha_bar_t_1 - sigma_i_2)
 
         # sample from q(x_{\tau_{i - 1}} | x_{\tau_t}, x_0)
         # HINT: use the reparameterization trick
+        noise = torch.randn_like(img) if tau_i > 0 else 0
+        u_i = (torch.sqrt(alpha_bar_t_1) * x_0) + (pred_noise_coeff * pred_noise)
+        img = u_i + (sigma_i * noise)
 
         return img, x_0
 
@@ -133,4 +164,5 @@ class DiffusionModel(nn.Module):
     @torch.no_grad()
     def sample_given_z(self, z, shape):
         #TODO 3.3: fill out based on the sample function above
-        pass
+        sample_fn = self.sample_ddpm if not self.is_ddim_sampling else self.sample_ddim
+        return sample_fn(shape, z)

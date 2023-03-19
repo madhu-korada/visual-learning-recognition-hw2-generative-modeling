@@ -42,9 +42,10 @@ def interpolate_latent_space(gen, path):
     
     
     # With mean 0 and standard deviation 1.
-    sample = torch.normal(mean=0, std=1, size=(1, 128)).cuda()         # 1. use repeat, why??
-    samples = sample.repeat(100, 1)                                    # 1. shape: (100, 128)
-    # samples = torch.zeros(100, 128)
+    # sample = torch.normal(mean=0, std=1, size=(1, 128)).cuda()         # 1. use repeat, why??
+    # samples = sample.repeat(100, 1)                                    # 1. shape: (100, 128)
+    # samples = torch.randn(100, 128).cuda()
+    samples = torch.zeros(100, 128)
     
     interp_steps = torch.linspace(-1, 1, 10)                           # 3. shape: (10,)
     grid_x, grid_y = torch.meshgrid(interp_steps, interp_steps)        # 3. shape: (10, 10)
