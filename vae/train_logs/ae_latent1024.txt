@@ -1,0 +1,28 @@
+epoch 0
+epoch 1
+epoch 2
+epoch 3
+epoch 4
+4 {'recon_loss': 0.022639027}
+4 {'recon_loss': 0.020534366}
+epoch 5
+epoch 6
+epoch 7
+epoch 8
+epoch 9
+9 {'recon_loss': 0.012753929}
+9 {'recon_loss': 0.012327778}
+epoch 10
+epoch 11
+epoch 12
+epoch 13
+epoch 14
+14 {'recon_loss': 0.00927653}
+14 {'recon_loss': 0.009365158}
+epoch 15
+epoch 16
+epoch 17
+epoch 18
+epoch 19
+19 {'recon_loss': 0.0070561324}
+19 {'recon_loss': 0.007030174}

@@ -20,3 +20,12 @@ diffusion_solutions/epoch_199.pth
 venv/
 .idea/
 .ipynb_checkpoints/
+
+vae/data/cifar-10-batches-py/batches.meta
+vae/data/cifar-10-batches-py/data_batch_1
+vae/data/cifar-10-batches-py/data_batch_2
+vae/data/cifar-10-batches-py/data_batch_3
+vae/data/cifar-10-batches-py/data_batch_4
+vae/data/cifar-10-batches-py/data_batch_5
+vae/data/cifar-10-batches-py/readme.html
+vae/data/cifar-10-batches-py/test_batch

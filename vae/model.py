@@ -32,7 +32,7 @@ class Encoder(nn.Module):
         )
 
         #TODO 2.1: fill in self.fc, such that output dimension is self.latent_dim
-        self.last_conv_shape = [256, input_shape//8, input_shape//8]                            # [256, 4, 4]
+        self.last_conv_shape = torch.tensor([256, input_shape[1]//8, input_shape[2]//8])        # [256, 4, 4]
         self.fc = nn.Linear(torch.prod(self.last_conv_shape), self.latent_dim)                  # [256*4*4, 256]
     
     def forward(self, x):
